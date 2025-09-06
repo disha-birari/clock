@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customize Your Clock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --primary-green: #34D399;
+            --primary-dark-green: #10B981;
+            --secondary-blue: #3B82F6;
+            --text-dark: #2A364F;
+            --text-light: #5C6B80;
+            --bg-light: #F9FAFB;
+            --bg-medium: #F3F4F6;
+            --border-color: #E5E7EB;
+            --white: #FFFFFF;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+        
+        /* Navbar from homepage */
+        .navbar {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 15px 50px;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+        .logo-container {
+            margin-right: auto;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            text-decoration: none;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .logo:hover {
+            color: var(--primary-dark-green);
+            transform: scale(1.03);
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            margin-left: auto;
+        }
+        .nav-links li {
+            margin-left: 25px;
+        }
+        .nav-links li:last-child {
+            margin-right: 1in;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            transition: color 0.3s ease, transform 0.2s ease, text-shadow 0.3s ease;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 3px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary-green);
+            transition: width 0.3s ease-out;
+        }
+        .nav-links a:hover {
+            color: var(--primary-dark-green);
+            transform: translateY(-3px);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Clock-specific styles */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding-top: 6rem; /* Space for the fixed navbar */
+            padding-bottom: 2rem;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .main-container {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                padding-top: 6rem;
+                gap: 2rem;
+            }
+        }
+        
+        .clock-container {
+            width: min(80vw, 600px);
+            height: min(80vw, 600px);
+            position: relative;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .clock-face {
+            width: 100%;
+            height: 100%;
+            background-color: var(--white);
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .clock-number {
+            position: absolute;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        #number-12 { top: 3%; left: 50%; transform: translateX(-50%); }
+        #number-3 { top: 50%; right: 3%; transform: translateY(-50%); }
+        #number-6 { bottom: 3%; left: 50%; transform: translateX(-50%); }
+        #number-9 { top: 50%; left: 3%; transform: translateY(-50%); }
+        .image-circle-area {
+            position: absolute;
+            width: 25%;
+            height: 25%;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-light);
+            border: 5px solid rgba(255, 255, 255, 0.5); /* Updated border to transparent white */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            touch-action: none; /* Prevents touch scrolling while dragging */
+        }
+        .image-circle-area:hover {
+            border-color: var(--primary-green);
+        }
+        .image-circle-area.has-image {
+            border: none;
+            cursor: grab;
+        }
+        .image-circle-area.has-image.is-dragging {
+            cursor: grabbing;
+        }
+        .image-circle-area.has-image.active {
+            border: 5px solid var(--secondary-blue); /* Updated border width */
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+        }
+        .image-circle-area img {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            object-fit: cover;
+            object-position: center center;
+            z-index: 10;
+            transition: transform 0.1s ease-out; /* Smooth transition for zoom */
+            transform: translate(0, 0);
+        }
+        .image-circle-area .placeholder-text {
+            font-size: 1rem;
+            color: var(--text-light);
+            font-weight: 700; /* Made the font bold */
+            z-index: 20;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .image-1 { top: 15%; left: 50%; transform: translateX(-50%); }
+        .image-2 { top: 50%; right: 15%; transform: translateY(-50%); }
+        .image-3 { bottom: 15%; left: 50%; transform: translateX(-50%); }
+        .image-4 { top: 50%; left: 15%; transform: translateY(-50%); }
+        .image-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.1);
+            z-index: 0;
+            opacity: 0.1;
+            filter: blur(10px);
+            transition: opacity 0.5s ease-in-out;
+        }
+        .clock-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background-color: var(--text-dark);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+        }
+        .hand {
+            position: absolute;
+            background-color: var(--text-dark);
+            transform-origin: bottom center;
+            z-index: 90;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hour-hand { width: 8px; height: 35%; top: 15%; left: calc(50% - 4px); border-radius: 5px; }
+        .minute-hand { width: 6px; height: 40%; top: 10%; left: calc(50% - 3px); border-radius: 5px; }
+        .second-hand { width: 3px; height: 45%; top: 5%; left: calc(50% - 1.5px); background-color: var(--primary-green); border-radius: 5px; }
+        .hand.hidden {
+            display: none;
+        }
+        
+        /* Footer from homepage */
+        footer {
+            background-color: var(--text-dark);
+            color: var(--bg-light);
+            padding: 60px 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            border-top: 8px solid var(--primary-green);
+            position: relative;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .footer-content > div {
+            flex: 1;
+            min-width: 250px;
+            margin: 20px;
+        }
+        footer h3 {
+            border-bottom: 3px solid var(--primary-green);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+            color: var(--white);
+        }
+        .contact-info p {
+            margin: 8px 0;
+            font-size: 0.95rem;
+        }
+        .social-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .social-icon {
+            color: var(--bg-light);
+            font-size: 1.8rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .social-icon:hover {
+            color: var(--primary-green);
+            transform: translateY(-5px) scale(1.1);
+        }
+        .feedback-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .feedback-btn {
+            background: none;
+            border: 2px solid var(--bg-light);
+            color: var(--bg-light);
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+        }
+        .feedback-btn:hover {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            position: relative;
+            max-width: 550px;
+            width: 90%;
+            text-align: center;
+        }
+        .close-btn {
+            color: var(--text-light);
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: var(--text-dark);
+        }
+        #feedback-form textarea {
+            width: calc(100% - 20px);
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: vertical;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        #feedback-form textarea:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
+            outline: none;
+        }
+        .submit-btn {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .submit-btn:hover {
+            background-color: var(--primary-dark-green);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive design from homepage */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            .nav-links {
+                display: flex;
+                justify-content: space-around;
+                width: 100%;
+                margin-top: 15px;
+                margin-left: 0;
+            }
+            .nav-links li {
+                margin-left: 0;
+                font-size: 0.9rem;
+            }
+            .nav-links li:last-child {
+                margin-right: 0;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+            .cta-button {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            .about-process {
+                padding: 60px 20px;
+            }
+            .about-process h2 {
+                font-size: 2rem;
+            }
+            .process-steps {
+                flex-direction: column;
+                align-items: center;
+            }
+            .step {
+                flex-basis: 100%;
+                max-width: 90%;
+            }
+            footer {
+                padding: 40px 20px;
+                flex-direction: column;
+                align-items: center;
+            }
+            .footer-content > div {
+                margin: 15px 0;
+                text-align: center;
+            }
+            .social-links {
+                justify-content: center;
+            }
+            .feedback-buttons {
+                justify-content: center;
+            }
+            .modal-content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    
+    <header>
+        <nav class="navbar">
+            <div class="logo-container">
+                <a href="index.html" class="logo">Custom Clock Creations</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="samples.html">Samples</a></li>
+                <li><a href="enquiry.html">Enquiry</a></li>
+                <li><a href="account.html">My Account</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm md:w-1/3 flex-shrink-0">
+            <h2 class="text-2xl font-bold mb-6 text-center">Customize Your Clock</h2>
+            
+            <div class="mb-6 flex items-center justify-between">
+                <label for="showHands" class="text-lg font-medium">Show Clock Hands</label>
+                <input type="checkbox" id="showHands" checked class="form-checkbox h-5 w-5 text-green-600 rounded">
+            </div>
+            
+            <div id="zoomControls" class="mb-6 hidden">
+                <h3 class="text-lg font-medium mb-2">Zoom Image</h3>
+                <input type="range" id="zoomSlider" min="1.0" max="3.0" step="0.1" value="1.0" class="w-full">
+                <div class="flex justify-between text-sm text-gray-500 mt-1">
+                    <span>1.0x</span>
+                    <span>3.0x</span>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold mb-4">Image Status</h3>
+                <table class="min-w-full bg-gray-50 rounded-lg shadow-inner">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 bg-gray-200 text-left font-semibold">Image</th>
+                            <th class="py-2 px-4 bg-gray-200 text-left font-semibold">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="status-table-body">
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                 <button id="resetChangesBtn" class="bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors shadow-md">
+                    Reset
+                </button>
+                <button id="saveChangesBtn" class="bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md">
+                    Save Changes
+                </button>
+                <button id="submitBtn" class="bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md">
+                    Submit Images
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-grow flex items-center justify-center p-8 relative">
+            <div class="clock-container relative">
+                <div class="clock-face">
+                    <div id="image-bg" class="image-bg"></div>
+
+                    <div id="number-12" class="clock-number">12</div>
+                    <div id="number-3" class="clock-number">3</div>
+                    <div id="number-6" class="clock-number">6</div>
+                    <div id="number-9" class="clock-number">9</div>
+
+                    <div class="image-circle-area image-1" data-image-id="1">
+                        <span class="placeholder-text">Add Image 1</span>
+                        <input type="file" class="hidden" accept="image/*">
+                    </div>
+                    <div class="image-circle-area image-2" data-image-id="2">
+                        <span class="placeholder-text">Add Image 2</span>
+                        <input type="file" class="hidden" accept="image/*">
+                    </div>
+                    <div class="image-circle-area image-3" data-image-id="3">
+                        <span class="placeholder-text">Add Image 3</span>
+                        <input type="file" class="hidden" accept="image/*">
+                    </div>
+                    <div class="image-circle-area image-4" data-image-id="4">
+                        <span class="placeholder-text">Add Image 4</span>
+                        <input type="file" class="hidden" accept="image/*">
+                    </div>
+                    
+                    <div class="hand hour-hand"></div>
+                    <div class="hand minute-hand"></div>
+                    <div class="hand second-hand"></div>
+                    
+                    <div class="clock-center"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="contact-info">
+                <h3>Contact Us</h3>
+                <p>123 Clocktower Lane, Creative City, 400607</p>
+                <p>Email: info@customclocks.com</p>
+                <p>Phone: +91 98765 43210</p>
+            </div>
+            <div class="social-links">
+                <h3>Connect with us</h3>
+                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+            </div>
+            <div class="feedback">
+                <h3>Your Experience</h3>
+                <p>How was your experience?</p>
+                <div class="feedback-buttons">
+                    <button class="feedback-btn" id="thumbsUp"><i class="fas fa-thumbs-up"></i></button>
+                    <button class="feedback-btn" id="thumbsDown"><i class="fas fa-thumbs-down"></i></button>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>We're sorry to hear that!</h3>
+            <p>Please tell us how we can improve. Your feedback is important to us.</p>
+            <form id="feedback-form">
+                <textarea id="feedback-text" placeholder="Enter your feedback here..." rows="5" required></textarea>
+                <button type="submit" class="submit-btn">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const imageAreas = document.querySelectorAll('.image-circle-area');
+            const statusTableBody = document.getElementById('status-table-body');
+            const showHandsCheckbox = document.getElementById('showHands');
+            const imageBg = document.getElementById('image-bg');
+            const thumbsUpBtn = document.getElementById('thumbsUp');
+            const thumbsDownBtn = document.getElementById('thumbsDown');
+            const feedbackModal = document.getElementById('feedback-modal');
+            const closeBtn = document.querySelector('.close-btn');
+            const feedbackForm = document.getElementById('feedback-form');
+            const saveChangesBtn = document.getElementById('saveChangesBtn');
+            const resetChangesBtn = document.getElementById('resetChangesBtn');
+            const zoomControls = document.getElementById('zoomControls');
+            const zoomSlider = document.getElementById('zoomSlider');
+            
+
+            let images = {};
+            let activeImageId = null;
+            
+            for (let i = 1; i <= 4; i++) {
+                images[i] = { status: 'Upload', xOffset: 0, yOffset: 0, scale: 1.0, src: '' };
+            }
+
+            const updateStatusTable = () => {
+                statusTableBody.innerHTML = '';
+                for (let i = 1; i <= 4; i++) {
+                    const row = document.createElement('tr');
+                    const statusClass = images[i].status === 'Uploaded' ? 'text-green-600 font-semibold' : 'text-gray-500';
+                    row.innerHTML = `
+                        <td class="py-2 px-4">Image ${i}</td>
+                        <td class="py-2 px-4 ${statusClass}">${images[i].status}</td>
+                    `;
+                    statusTableBody.appendChild(row);
+                }
+            };
+
+            const updateImageTransform = (imageId) => {
+                const area = document.querySelector(`[data-image-id='${imageId}']`);
+                const img = area.querySelector('img');
+                if (img) {
+                    const imgData = images[imageId];
+                    img.style.transform = `translate(${imgData.xOffset}px, ${imgData.yOffset}px) scale(${imgData.scale})`;
+                }
+            };
+
+            updateStatusTable();
+
+            imageAreas.forEach(area => {
+                const fileInput = area.querySelector('input[type="file"]');
+                const imageId = area.dataset.imageId;
+                let activeImage = null;
+                let initialX = 0;
+                let initialY = 0;
+
+                // Handle file input
+                area.addEventListener('click', (event) => {
+                    // Set the active image area and enable controls
+                    imageAreas.forEach(a => a.classList.remove('active'));
+                    area.classList.add('active');
+                    activeImageId = imageId;
+                    
+                    if (area.classList.contains('has-image')) {
+                        zoomControls.classList.remove('hidden');
+                        const currentScale = images[activeImageId].scale;
+                        zoomSlider.value = currentScale;
+                    } else {
+                        zoomControls.classList.add('hidden');
+                    }
+
+                    if (event.target.tagName !== 'IMG') {
+                        fileInput.click();
+                    }
+                });
+
+                fileInput.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const imageUrl = e.target.result;
+                            images[imageId].status = 'Uploaded';
+                            images[imageId].src = imageUrl; // Save the image data URL
+                            
+                            const placeholderText = area.querySelector('.placeholder-text');
+                            if (placeholderText) {
+                                placeholderText.remove();
+                            }
+                            
+                            let imgElement = area.querySelector('img');
+                            if (!imgElement) {
+                                imgElement = document.createElement('img');
+                                area.appendChild(imgElement);
+                            }
+                            imgElement.src = imageUrl;
+                            area.classList.add('has-image');
+                            
+                            imageBg.style.backgroundImage = `url(${imageUrl})`;
+
+                            updateStatusTable();
+                            updateImageTransform(imageId);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // --- Drag and Drop Logic ---
+                const dragStart = (e) => {
+                    if (!area.classList.contains('has-image')) return;
+
+                    const image = area.querySelector('img');
+                    if (e.target !== image) return;
+                    
+                    activeImage = image;
+                    area.classList.add('is-dragging');
+
+                    const imgData = images[imageId];
+                    
+                    if (e.type === 'touchstart') {
+                        initialX = e.touches[0].clientX - imgData.xOffset;
+                        initialY = e.touches[0].clientY - imgData.yOffset;
+                    } else {
+                        initialX = e.clientX - imgData.xOffset;
+                        initialY = e.clientY - imgData.yOffset;
+                    }
+
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('mouseup', dragEnd);
+                    document.addEventListener('touchmove', drag);
+                    document.addEventListener('touchend', dragEnd);
+                };
+
+                const dragEnd = (e) => {
+                    activeImage = null;
+                    area.classList.remove('is-dragging');
+                    document.removeEventListener('mousemove', drag);
+                    document.removeEventListener('mouseup', dragEnd);
+                    document.removeEventListener('touchmove', drag);
+                    document.removeEventListener('touchend', dragEnd);
+                };
+
+                const drag = (e) => {
+                    if (!activeImage) return;
+                    e.preventDefault();
+
+                    let clientX, clientY;
+                    if (e.type === 'touchmove') {
+                        clientX = e.touches[0].clientX;
+                        clientY = e.touches[0].clientY;
+                    } else {
+                        clientX = e.clientX;
+                        clientY = e.clientY;
+                    }
+
+                    const dx = clientX - initialX;
+                    const dy = clientY - initialY;
+                    
+                    const imgData = images[imageId];
+                    imgData.xOffset = dx;
+                    imgData.yOffset = dy;
+                    
+                    updateImageTransform(imageId);
+                };
+
+                area.addEventListener('mousedown', dragStart);
+                area.addEventListener('touchstart', dragStart);
+            });
+            // --- End of Drag and Drop Logic ---
+
+            // --- Zoom Logic ---
+            zoomSlider.addEventListener('input', (event) => {
+                if (activeImageId) {
+                    const newScale = parseFloat(event.target.value);
+                    images[activeImageId].scale = newScale;
+                    updateImageTransform(activeImageId);
+                }
+            });
+            // --- End of Zoom Logic ---
+
+            // Handle Clock Hands toggle
+            showHandsCheckbox.addEventListener('change', (event) => {
+                const hands = document.querySelectorAll('.hand');
+                if (event.target.checked) {
+                    hands.forEach(hand => hand.classList.remove('hidden'));
+                } else {
+                    hands.forEach(hand => hand.classList.add('hidden'));
+                }
+            });
+
+            // Clock Hands Functionality
+            const hourHand = document.querySelector('.hour-hand');
+            const minuteHand = document.querySelector('.minute-hand');
+            const secondHand = document.querySelector('.second-hand');
+            const setTime = () => {
+                const date = new Date();
+                const seconds = date.getSeconds();
+                const minutes = date.getMinutes();
+                const hours = date.getHours();
+                const secondsDegrees = ((seconds / 60) * 360);
+                const minutesDegrees = ((minutes / 60) * 360) + ((seconds/60)*6);
+                const hoursDegrees = ((hours / 12) * 360) + ((minutes/60)*30);
+                secondHand.style.transform = `rotate(${secondsDegrees}deg)`;
+                minuteHand.style.transform = `rotate(${minutesDegrees}deg)`;
+                hourHand.style.transform = `rotate(${hoursDegrees}deg)`;
+            };
+            setTime();
+            setInterval(setTime, 1000);
+
+            // Placeholder functions for buttons
+            document.getElementById('submitBtn').addEventListener('click', () => {
+                const uploadedImages = Object.values(images).filter(img => img.status === 'Uploaded');
+                if (uploadedImages.length > 0) {
+                    localStorage.setItem('clockData', JSON.stringify(images));
+                    
+                    const messageBox = document.createElement('div');
+                    messageBox.innerHTML = `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; text-align: center;">Thank you, your clock is in the making!</div>`;
+                    document.body.appendChild(messageBox);
+                    
+                    // Redirect almost instantly after showing the popup.
+                    setTimeout(() => {
+                        messageBox.remove();
+                        window.location.href = 'receipt.html';
+                    }, 100); 
+                } else {
+                    const messageBox = document.createElement('div');
+                    messageBox.innerHTML = `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; text-align: center;">Please upload at least one image before submitting.</div>`;
+                    document.body.appendChild(messageBox);
+                    setTimeout(() => messageBox.remove(), 3000);
+                }
+            });
+
+            saveChangesBtn.addEventListener('click', () => {
+                // Use a custom message box instead of alert()
+                const messageBox = document.createElement('div');
+                messageBox.innerHTML = `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; text-align: center;">Changes saved!</div>`;
+                document.body.appendChild(messageBox);
+                setTimeout(() => messageBox.remove(), 2000);
+            });
+
+            resetChangesBtn.addEventListener('click', () => {
+                // Use custom modal for confirmation
+                const confirmationModal = document.createElement('div');
+                confirmationModal.classList.add('modal');
+                confirmationModal.innerHTML = `
+                    <div class="modal-content">
+                        <h3>Are you sure you want to reset all images?</h3>
+                        <div class="flex justify-center gap-4 mt-4">
+                            <button id="confirmReset" class="bg-red-500 text-white px-4 py-2 rounded">Yes, Reset</button>
+                            <button id="cancelReset" class="bg-gray-400 text-white px-4 py-2 rounded">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(confirmationModal);
+                confirmationModal.style.display = 'flex';
+
+                document.getElementById('confirmReset').addEventListener('click', () => {
+                    images = {};
+                    imageAreas.forEach(area => {
+                        area.classList.remove('has-image', 'active');
+                        const img = area.querySelector('img');
+                        if (img) {
+                           img.style.transform = `translate(0px, 0px)`;
+                           img.remove();
+                        }
+                        const placeholderText = area.querySelector('.placeholder-text');
+                        if (!placeholderText) {
+                            const span = document.createElement('span');
+                            span.className = 'placeholder-text';
+                            span.textContent = `Add Image ${area.dataset.imageId}`;
+                            area.appendChild(span);
+                        }
+                    });
+                    for (let i = 1; i <= 4; i++) {
+                        images[i] = { status: 'Upload', xOffset: 0, yOffset: 0, scale: 1.0, src: '' };
+                    }
+                    updateStatusTable();
+                    imageBg.style.backgroundImage = '';
+                    zoomControls.classList.add('hidden');
+                    activeImageId = null;
+                    
+                    // Use a custom message box instead of alert()
+                    const messageBox = document.createElement('div');
+                    messageBox.innerHTML = `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; text-align: center;">Images have been reset.</div>`;
+                    document.body.appendChild(messageBox);
+                    setTimeout(() => messageBox.remove(), 2000);
+                    
+                    confirmationModal.remove();
+                });
+
+                document.getElementById('cancelReset').addEventListener('click', () => {
+                    confirmationModal.remove();
+                });
+            });
+
+            document.getElementById('generatePdfBtn').addEventListener('click', () => {
+                // Use a custom message box instead of alert()
+                const messageBox = document.createElement('div');
+                messageBox.innerHTML = `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; text-align: center;">PDF generation is a feature to be implemented. A server-side process is typically required for this.</div>`;
+                document.body.appendChild(messageBox);
+                setTimeout(() => messageBox.remove(), 2000);
+            });
+
+            // Feedback modal functionality
+            thumbsUpBtn.addEventListener('click', () => {
+                // Use a custom message box instead of alert()
+                const messageBox = document.createElement('div');
+                messageBox.innerHTML = `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; text-align: center;">Thank you for your positive feedback! We're glad you enjoyed your experience.</div>`;
+                document.body.appendChild(messageBox);
+                setTimeout(() => messageBox.remove(), 2000);
+                console.log("Thumbs up clicked");
+            });
+
+            thumbsDownBtn.addEventListener('click', () => {
+                feedbackModal.style.display = 'flex';
+            });
+
+            closeBtn.addEventListener('click', () => {
+                feedbackModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === feedbackModal) {
+                    feedbackModal.style.display = 'none';
+                }
+            });
+
+            feedbackForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const feedbackText = document.getElementById('feedback-text').value;
+                if (feedbackText.trim() !== '') {
+                    // Use a custom message box instead of alert()
+                    const messageBox = document.createElement('div');
+                    messageBox.innerHTML = `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; text-align: center;">Thank you for your valuable feedback! We'll use it to improve.</div>`;
+                    document.body.appendChild(messageBox);
+                    setTimeout(() => messageBox.remove(), 2000);
+                    console.log("Feedback submitted:", feedbackText);
+                    feedbackModal.style.display = 'none';
+                    feedbackForm.reset();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
