@@ -7,14 +7,13 @@ import {
   Eye, 
   Activity, 
   Database,
-  Radio,
   Award,
-  Star,
   Users,
   Camera,
   Ruler,
   Sparkles,
-  Gift
+  Volume2,
+  Columns
 } from 'lucide-react';
 
 export type ActiveTab = 'studio' | 'photo' | 'catalog' | 'room' | 'tracker' | 'auth' | 'reviews';
@@ -27,6 +26,8 @@ interface NavbarProps {
   onOpenCoDesignModal: () => void;
   onOpenDistanceModal: () => void;
   onOpenARModal: () => void;
+  onOpenSoundModal: () => void;
+  onOpenCompareModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -37,6 +38,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCoDesignModal,
   onOpenDistanceModal,
   onOpenARModal,
+  onOpenSoundModal,
+  onOpenCompareModal,
 }) => {
   const firebaseConnected = isFirebaseConnected();
 
@@ -141,6 +144,26 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
+          {/* Sound Simulator Button */}
+          <button
+            onClick={onOpenSoundModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 text-xs font-semibold transition-colors"
+            title="Acoustic Chime & Tick Simulator"
+          >
+            <Volume2 className="w-3.5 h-3.5" />
+            <span>Chime Sound</span>
+          </button>
+
+          {/* Design Matrix Compare Button */}
+          <button
+            onClick={onOpenCompareModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 text-xs font-semibold transition-colors"
+            title="Compare Saved Clock Designs"
+          >
+            <Columns className="w-3.5 h-3.5" />
+            <span>Compare</span>
+          </button>
+
           {/* AR Camera Wall Preview */}
           <button
             onClick={onOpenARModal}
@@ -148,7 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Live AR Camera Wall Preview"
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>AR Camera Wall</span>
+            <span>AR Camera</span>
           </button>
 
           <button

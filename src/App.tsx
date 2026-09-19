@@ -20,6 +20,10 @@ import { DistanceCalculatorModal } from './components/DistanceCalculatorModal';
 import { ARWallCameraModal } from './components/ARWallCameraModal';
 import { VoiceMessageRecorder } from './components/VoiceMessageRecorder';
 import { GiftPackagingStudio } from './components/GiftPackagingStudio';
+import { SoundSimulatorModal } from './components/SoundSimulatorModal';
+import { LEDBacklightStudio } from './components/LEDBacklightStudio';
+import { ClockCompareModal } from './components/ClockCompareModal';
+import { CurrencyCode } from './lib/currencies';
 import { 
   RotateCcw, 
   Clock
@@ -29,6 +33,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('photo');
   const [clockConfig, setClockConfig] = useState<ClockConfig>(DEFAULT_CLOCK_CONFIG);
   const [activeTrackingNumber, setActiveTrackingNumber] = useState<string>('CHRONO-98421-US');
+  const [savedConfigs, setSavedConfigs] = useState<ClockConfig[]>([]);
 
   // Modals state
   const [isFirebaseModalOpen, setIsFirebaseModalOpen] = useState(false);
@@ -36,6 +41,8 @@ export function App() {
   const [isCoDesignModalOpen, setIsCoDesignModalOpen] = useState(false);
   const [isDistanceModalOpen, setIsDistanceModalOpen] = useState(false);
   const [isARModalOpen, setIsARModalOpen] = useState(false);
+  const [isSoundModalOpen, setIsSoundModalOpen] = useState(false);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -71,6 +78,8 @@ export function App() {
         onOpenCoDesignModal={() => setIsCoDesignModalOpen(true)}
         onOpenDistanceModal={() => setIsDistanceModalOpen(true)}
         onOpenARModal={() => setIsARModalOpen(true)}
+        onOpenSoundModal={() => setIsSoundModalOpen(true)}
+        onOpenCompareModal={() => setIsCompareModalOpen(true)}
       />
 
       {/* Real-Time Live Activity Stream Ticker */}
@@ -121,6 +130,14 @@ export function App() {
                   </div>
                 </div>
 
+                {/* LED Backlight Studio */}
+                <LEDBacklightStudio
+                  ledEnabled={clockConfig.ledBacklight}
+                  ledColor={clockConfig.ledColor || '#FCE076'}
+                  onToggleLed={(enabled) => setClockConfig((prev) => ({ ...prev, ledBacklight: enabled }))}
+                  onChangeLedColor={(color) => setClockConfig((prev) => ({ ...prev, ledColor: color, ledBacklight: true }))}
+                />
+
                 {/* Voice Chime Message Recorder */}
                 <VoiceMessageRecorder onAudioSaved={(url) => console.log('Voice chime recorded', url)} />
 
@@ -165,6 +182,23 @@ export function App() {
 
       {/* Floating Live Consultation Chat Widget */}
       <LiveChatWidget />
+
+      {/* Mechanical Sound & Chime Simulator Modal */}
+      <SoundSimulatorModal
+        isOpen={isSoundModalOpen}
+        onClose={() => setIsSoundModalOpen(false)}
+        currentChime={clockConfig.chime}
+        onSelectChime={(chime) => setClockConfig((prev) => ({ ...prev, chime }))}
+      />
+
+      {/* Side-by-Side Design Comparison Matrix Modal */}
+      <ClockCompareModal
+        isOpen={isCompareModalOpen}
+        onClose={() => setIsCompareModalOpen(false)}
+        savedConfigs={PRESET_CLOCKS}
+        currentConfig={clockConfig}
+        currency="USD"
+      />
 
       {/* Live AR Camera Wall Previewer Modal */}
       <ARWallCameraModal
