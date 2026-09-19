@@ -40,10 +40,57 @@ export type LaserInlayStyle =
   | 'silver-inlay' 
   | 'black-enamel';
 
+export type PhotoMaskShape = 
+  | 'circle' 
+  | 'heart' 
+  | 'quadrant' 
+  | 'diamond' 
+  | 'hexagon' 
+  | '12-hour-circles' 
+  | 'square-grid';
+
+export type ClockBodyShape = 
+  | 'round-wall' 
+  | 'square-minimal' 
+  | 'arch-tabletop' 
+  | 'hexagon-geometric';
+
+export type ClockPinStyle = 
+  | 'gold-bullet-pin' 
+  | 'silver-capped-pin' 
+  | 'black-obsidian-pin' 
+  | 'ruby-gem-pin';
+
+export interface PhotoSlot {
+  id: number;
+  label: string; // e.g. "Hour 12", "Top Left Quadrant"
+  imageUrl?: string;
+  zoom: number;
+  xOffset: number;
+  yOffset: number;
+}
+
+export interface PhotoClockConfig {
+  photoCount: 1 | 2 | 3 | 4 | 6 | 12;
+  maskShape: PhotoMaskShape;
+  slots: PhotoSlot[];
+  bodyShape: ClockBodyShape;
+  pinStyle: ClockPinStyle;
+  pinColor: string;
+  frameMaterial: FrameMaterial;
+  dialColor: string;
+  size: SizeInches;
+  handStyle: HandStyle;
+  handColor: string;
+  secondHandColor: string;
+  engravedText?: string;
+  engravedFont?: string;
+}
+
 export interface WorldSubdial {
   id: string;
-  label: string; // e.g. "LONDON", "TOKYO", "NEW YORK"
-  timezoneOffsetHours: number; // e.g. -5, 0, +9
+  label: string;
+  timezoneOffsetHours: number;
   position: 'left' | 'right' | 'bottom';
 }
 
@@ -52,7 +99,7 @@ export interface ClockConfig {
   name: string;
   size: SizeInches;
   frameMaterial: FrameMaterial;
-  dialColor: string; // Hex color or gradient token
+  dialColor: string;
   dialTexture: 'smooth' | 'brushed-wood' | 'marble-vein' | 'sunburst' | 'custom-photo';
   customPhotoUrl?: string;
   numeralStyle: NumeralStyle;
@@ -67,8 +114,8 @@ export interface ClockConfig {
   ledBacklight: boolean;
   ledColor?: string;
   chime: ChimeType;
-  lightAngleDegrees?: number; // 0 to 360 degree studio light angle
-  subdials?: WorldSubdial[]; // Multi-timezone sub-dials
+  lightAngleDegrees?: number;
+  subdials?: WorldSubdial[];
   createdAt?: string;
 }
 

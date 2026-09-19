@@ -15,14 +15,14 @@ import { CollaborativeSessionModal } from './components/CollaborativeSessionModa
 import { SerialAuthenticator } from './components/SerialAuthenticator';
 import { CustomerReviews } from './components/CustomerReviews';
 import { LiveActivityTicker } from './components/LiveActivityTicker';
+import { PhotoClockStudio } from './components/PhotoClockStudio';
 import { 
-  Sparkles, 
   RotateCcw, 
   Clock
 } from 'lucide-react';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('studio');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('photo'); // default to Multi-Photo Studio
   const [clockConfig, setClockConfig] = useState<ClockConfig>(DEFAULT_CLOCK_CONFIG);
   const [activeTrackingNumber, setActiveTrackingNumber] = useState<string>('CHRONO-98421-US');
 
@@ -31,7 +31,6 @@ export function App() {
   const [isBespokeModalOpen, setIsBespokeModalOpen] = useState(false);
   const [isCoDesignModalOpen, setIsCoDesignModalOpen] = useState(false);
 
-  // Parse share link ?design= if present
   useEffect(() => {
     try {
       const urlParams = new URLSearchParams(window.location.search);
@@ -66,14 +65,15 @@ export function App() {
 
       {/* Main Content Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-8">
-        {/* VIEW 1: STUDIO CUSTOMIZER */}
+        {/* VIEW 1: MULTI-PHOTO MEMORY CLOCK STUDIO */}
+        {activeTab === 'photo' && <PhotoClockStudio />}
+
+        {/* VIEW 2: STANDARD CHRONO STUDIO CUSTOMIZER */}
         {activeTab === 'studio' && (
           <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Left Column: Live HTML5 Canvas Clock Visualizer */}
               <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
                 <div className="bg-[#11141D]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[460px]">
-                  {/* Preset quick buttons top overlay */}
                   <div className="w-full flex items-center justify-between border-b border-white/10 pb-3 mb-4 text-xs">
                     <span className="text-slate-400 font-mono text-[10px] uppercase tracking-wider flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5 text-gold-400" />
@@ -88,12 +88,10 @@ export function App() {
                     </button>
                   </div>
 
-                  {/* Real-time Ticking HTML5 Canvas Clock Component */}
                   <div className="my-auto py-4">
                     <ClockCanvas config={clockConfig} sizePx={340} />
                   </div>
 
-                  {/* Quick Preset Selector Buttons */}
                   <div className="w-full pt-4 border-t border-white/10 flex items-center justify-center gap-2 overflow-x-auto">
                     <span className="text-[10px] text-slate-400 uppercase font-mono mr-1 shrink-0">
                       Presets:
@@ -111,7 +109,6 @@ export function App() {
                 </div>
               </div>
 
-              {/* Center/Right Column: Studio Customizer Controls & Price Calculator */}
               <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-12 gap-6">
                 <div className="md:col-span-7">
                   <ClockStudio config={clockConfig} onChange={setClockConfig} />
@@ -124,7 +121,7 @@ export function App() {
           </div>
         )}
 
-        {/* VIEW 2: SIGNATURE CATALOG */}
+        {/* VIEW 3: SIGNATURE CATALOG */}
         {activeTab === 'catalog' && (
           <Catalog
             onSelectPreset={(selectedConfig) => {
@@ -134,16 +131,16 @@ export function App() {
           />
         )}
 
-        {/* VIEW 3: ROOM WALL BACKDROP VISUALIZER */}
+        {/* VIEW 4: ROOM WALL BACKDROP VISUALIZER */}
         {activeTab === 'room' && <RoomVisualizer config={clockConfig} />}
 
-        {/* VIEW 4: REAL-TIME CLIENT ORDER TRACKER */}
+        {/* VIEW 5: REAL-TIME CLIENT ORDER TRACKER */}
         {activeTab === 'tracker' && <OrderTracker initialTracking={activeTrackingNumber} />}
 
-        {/* VIEW 5: LASER SERIAL AUTHENTICATOR */}
+        {/* VIEW 6: LASER SERIAL AUTHENTICATOR */}
         {activeTab === 'auth' && <SerialAuthenticator />}
 
-        {/* VIEW 6: VERIFIED CUSTOMER REVIEWS */}
+        {/* VIEW 7: VERIFIED CUSTOMER REVIEWS */}
         {activeTab === 'reviews' && <CustomerReviews />}
       </main>
 

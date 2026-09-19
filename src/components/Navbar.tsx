@@ -11,10 +11,11 @@ import {
   Radio,
   Award,
   Star,
-  Users
+  Users,
+  Camera
 } from 'lucide-react';
 
-export type ActiveTab = 'studio' | 'catalog' | 'room' | 'tracker' | 'auth' | 'reviews';
+export type ActiveTab = 'studio' | 'photo' | 'catalog' | 'room' | 'tracker' | 'auth' | 'reviews';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -71,6 +72,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
+            onClick={() => onTabChange('photo')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'photo'
+                ? 'bg-gold-500 text-black shadow-glow'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Camera className="w-3.5 h-3.5 text-amber-300" />
+            <span>Photo Memory Studio</span>
+          </button>
+
+          <button
             onClick={() => onTabChange('catalog')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeTab === 'catalog'
@@ -103,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <Activity className="w-3.5 h-3.5" />
-            <span>Order Tracker</span>
+            <span>Tracker</span>
           </button>
 
           <button
@@ -117,23 +130,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Award className="w-3.5 h-3.5" />
             <span>Authenticator</span>
           </button>
-
-          <button
-            onClick={() => onTabChange('reviews')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'reviews'
-                ? 'bg-gold-500 text-black shadow-glow'
-                : 'text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Star className="w-3.5 h-3.5" />
-            <span>Reviews</span>
-          </button>
         </nav>
 
         {/* Right CTA Actions */}
         <div className="flex items-center gap-2">
-          {/* Co-Design Session Modal Button */}
           <button
             onClick={onOpenCoDesignModal}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold-500/10 border border-gold-500/30 text-gold-300 hover:bg-gold-500/20 text-xs font-semibold transition-colors"
@@ -142,7 +142,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Co-Design</span>
           </button>
 
-          {/* Firebase Connection Indicator */}
           <button
             onClick={onOpenFirebaseModal}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono transition-all ${
