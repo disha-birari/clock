@@ -11,6 +11,7 @@ import {
 } from '../types/clock';
 import { MATERIAL_DETAILS, SIZE_PRICING } from '../lib/presets';
 import { playChimeSound } from './ClockCanvas';
+import { ContrastMeter } from './ContrastMeter';
 import { 
   Palette, 
   Sparkles, 
@@ -269,7 +270,7 @@ export const ClockStudio: React.FC<ClockStudioProps> = ({ config, onChange }) =>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gold-400 mb-3">
               Clock Hands Craftsmanship
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
               {[
                 { id: 'breguet-luxury', label: 'Breguet Luxury Ring' },
                 { id: 'classic-spade', label: 'Heritage Spade' },
@@ -289,6 +290,12 @@ export const ClockStudio: React.FC<ClockStudioProps> = ({ config, onChange }) =>
                 </button>
               ))}
             </div>
+
+            {/* Live Contrast Meter Analyzer */}
+            <ContrastMeter
+              handColor={config.handColor || '#E6C453'}
+              dialColor={config.dialColor || '#181C28'}
+            />
           </div>
         </div>
       )}
@@ -375,7 +382,6 @@ export const ClockStudio: React.FC<ClockStudioProps> = ({ config, onChange }) =>
             </div>
           </div>
 
-          {/* 360 Studio Lighting Angle Slider */}
           <div className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-gold-400 flex items-center gap-2">

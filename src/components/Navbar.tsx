@@ -12,7 +12,8 @@ import {
   Award,
   Star,
   Users,
-  Camera
+  Camera,
+  Ruler
 } from 'lucide-react';
 
 export type ActiveTab = 'studio' | 'photo' | 'catalog' | 'room' | 'tracker' | 'auth' | 'reviews';
@@ -23,6 +24,7 @@ interface NavbarProps {
   onOpenFirebaseModal: () => void;
   onOpenBespokeModal: () => void;
   onOpenCoDesignModal: () => void;
+  onOpenDistanceModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -31,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenFirebaseModal,
   onOpenBespokeModal,
   onOpenCoDesignModal,
+  onOpenDistanceModal,
 }) => {
   const firebaseConnected = isFirebaseConnected();
 
@@ -134,6 +137,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right CTA Actions */}
         <div className="flex items-center gap-2">
+          {/* Ergonomic Size Calculator Button */}
+          <button
+            onClick={onOpenDistanceModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-slate-100 hover:bg-white/20 text-xs font-semibold transition-colors"
+            title="Calculate optimal clock size based on room distance"
+          >
+            <Ruler className="w-3.5 h-3.5 text-gold-400" />
+            <span>Size Guide</span>
+          </button>
+
           <button
             onClick={onOpenCoDesignModal}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold-500/10 border border-gold-500/30 text-gold-300 hover:bg-gold-500/20 text-xs font-semibold transition-colors"

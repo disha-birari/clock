@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ClockConfig } from './types/clock';
+import { ClockConfig, SizeInches } from './types/clock';
 import { DEFAULT_CLOCK_CONFIG, PRESET_CLOCKS } from './lib/presets';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { ClockCanvas } from './components/ClockCanvas';
@@ -16,13 +16,14 @@ import { SerialAuthenticator } from './components/SerialAuthenticator';
 import { CustomerReviews } from './components/CustomerReviews';
 import { LiveActivityTicker } from './components/LiveActivityTicker';
 import { PhotoClockStudio } from './components/PhotoClockStudio';
+import { DistanceCalculatorModal } from './components/DistanceCalculatorModal';
 import { 
   RotateCcw, 
   Clock
 } from 'lucide-react';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('photo'); // default to Multi-Photo Studio
+  const [activeTab, setActiveTab] = useState<ActiveTab>('photo');
   const [clockConfig, setClockConfig] = useState<ClockConfig>(DEFAULT_CLOCK_CONFIG);
   const [activeTrackingNumber, setActiveTrackingNumber] = useState<string>('CHRONO-98421-US');
 
@@ -30,6 +31,7 @@ export function App() {
   const [isFirebaseModalOpen, setIsFirebaseModalOpen] = useState(false);
   const [isBespokeModalOpen, setIsBespokeModalOpen] = useState(false);
   const [isCoDesignModalOpen, setIsCoDesignModalOpen] = useState(false);
+  const [isDistanceModalOpen, setIsDistanceModalOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -49,6 +51,11 @@ export function App() {
     setActiveTab('tracker');
   };
 
+  const handleApplyRecommendedSize = (recommendedSize: SizeInches) => {
+    setClockConfig((prev) => ({ ...prev, size: recommendedSize }));
+    setActiveTab('studio');
+  };
+
   return (
     <div className="min-h-screen bg-[#0B0D12] text-slate-100 flex flex-col font-sans">
       {/* Top Navigation */}
@@ -58,6 +65,7 @@ export function App() {
         onOpenFirebaseModal={() => setIsFirebaseModalOpen(true)}
         onOpenBespokeModal={() => setIsBespokeModalOpen(true)}
         onOpenCoDesignModal={() => setIsCoDesignModalOpen(true)}
+        onOpenDistanceModal={() => setIsDistanceModalOpen(true)}
       />
 
       {/* Real-Time Live Activity Stream Ticker */}
@@ -146,6 +154,13 @@ export function App() {
 
       {/* Floating Live Consultation Chat Widget */}
       <LiveChatWidget />
+
+      {/* Ergonomic Distance Calculator Modal */}
+      <DistanceCalculatorModal
+        isOpen={isDistanceModalOpen}
+        onClose={() => setIsDistanceModalOpen(false)}
+        onSelectRecommendedSize={handleApplyRecommendedSize}
+      />
 
       {/* Collaborative Session Modal */}
       <CollaborativeSessionModal
