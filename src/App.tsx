@@ -17,6 +17,9 @@ import { CustomerReviews } from './components/CustomerReviews';
 import { LiveActivityTicker } from './components/LiveActivityTicker';
 import { PhotoClockStudio } from './components/PhotoClockStudio';
 import { DistanceCalculatorModal } from './components/DistanceCalculatorModal';
+import { ARWallCameraModal } from './components/ARWallCameraModal';
+import { VoiceMessageRecorder } from './components/VoiceMessageRecorder';
+import { GiftPackagingStudio } from './components/GiftPackagingStudio';
 import { 
   RotateCcw, 
   Clock
@@ -32,6 +35,7 @@ export function App() {
   const [isBespokeModalOpen, setIsBespokeModalOpen] = useState(false);
   const [isCoDesignModalOpen, setIsCoDesignModalOpen] = useState(false);
   const [isDistanceModalOpen, setIsDistanceModalOpen] = useState(false);
+  const [isARModalOpen, setIsARModalOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -57,7 +61,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0D12] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#08090D] text-slate-100 flex flex-col font-sans">
       {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -66,6 +70,7 @@ export function App() {
         onOpenBespokeModal={() => setIsBespokeModalOpen(true)}
         onOpenCoDesignModal={() => setIsCoDesignModalOpen(true)}
         onOpenDistanceModal={() => setIsDistanceModalOpen(true)}
+        onOpenARModal={() => setIsARModalOpen(true)}
       />
 
       {/* Real-Time Live Activity Stream Ticker */}
@@ -115,6 +120,12 @@ export function App() {
                     ))}
                   </div>
                 </div>
+
+                {/* Voice Chime Message Recorder */}
+                <VoiceMessageRecorder onAudioSaved={(url) => console.log('Voice chime recorded', url)} />
+
+                {/* Luxury Gift Packaging Studio */}
+                <GiftPackagingStudio onPackagingUpdated={(info) => console.log('Packaging updated', info)} />
               </div>
 
               <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -155,6 +166,13 @@ export function App() {
       {/* Floating Live Consultation Chat Widget */}
       <LiveChatWidget />
 
+      {/* Live AR Camera Wall Previewer Modal */}
+      <ARWallCameraModal
+        isOpen={isARModalOpen}
+        onClose={() => setIsARModalOpen(false)}
+        config={clockConfig}
+      />
+
       {/* Ergonomic Distance Calculator Modal */}
       <DistanceCalculatorModal
         isOpen={isDistanceModalOpen}
@@ -183,7 +201,7 @@ export function App() {
       />
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-[#0B0D12] py-8 px-4 text-xs text-slate-400 mt-12">
+      <footer className="border-t border-white/10 bg-[#08090D] py-8 px-4 text-xs text-slate-400 mt-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-serif font-bold text-slate-200">CHRONOCRAFT STUDIO</span>

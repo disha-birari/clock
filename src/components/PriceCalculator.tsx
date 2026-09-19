@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ClockConfig } from '../types/clock';
 import { MATERIAL_DETAILS, SIZE_PRICING } from '../lib/presets';
-import { createOrder, saveClockDesign, isFirebaseConnected } from '../lib/firebase';
+import { createOrder, saveClockDesign } from '../lib/firebase';
+import { CurrencyCode, CURRENCIES, formatCurrencyAmount } from '../lib/currencies';
 import confetti from 'canvas-confetti';
 import { 
   ShoppingCart, 
@@ -11,9 +12,8 @@ import {
   ShieldCheck, 
   Truck, 
   Clock, 
-  Sparkles,
-  Zap,
-  Info
+  Globe,
+  Gift
 } from 'lucide-react';
 
 interface PriceCalculatorProps {
@@ -22,13 +22,13 @@ interface PriceCalculatorProps {
 }
 
 export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrderCreated }) => {
+  const [currency, setCurrency] = useState<CurrencyCode>('USD');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
-  // Price Calculation Logic
   const sizeInfo = SIZE_PRICING[config.size] || SIZE_PRICING[14];
   const matInfo = MATERIAL_DETAILS[config.frameMaterial] || MATERIAL_DETAILS['walnut'];
 
@@ -39,7 +39,7 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
   const ledExtra = config.ledBacklight ? 30 : 0;
   const chimeExtra = config.chime === 'westminster-chime' ? 40 : 0;
 
-  const totalAmount = basePrice + materialExtra + photoExtra + engravingExtra + ledExtra + chimeExtra;
+  const totalAmountUsd = basePrice + materialExtra + photoExtra + engravingExtra + ledExtra + chimeExtra;
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +47,7 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
 
     setIsSubmitting(true);
     try {
-      const order = await createOrder(config, customerName, customerEmail, totalAmount);
+      const order = await createOrder(config, customerName, customerEmail, totalAmountUsd);
       confetti({
         particleCount: 120,
         spread: 80,
@@ -65,11 +65,7 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
   const handleSaveDesign = async () => {
     try {
       const designId = await saveClockDesign(config);
-      confetti({
-        particleCount: 50,
-        spread: 50,
-        origin: { y: 0.7 },
-      });
+      confetti({ particleCount: 50, spread: 50 });
       setSaveMessage(`Design Saved! ID: ${designId}`);
       setTimeout(() => setSaveMessage(null), 4000);
     } catch (e) {
@@ -88,20 +84,34 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
   return (
     <div className="bg-[#11141D]/90 backdrop-blur-xl border border-gold-500/30 rounded-2xl p-6 shadow-glow-lg flex flex-col justify-between h-full">
       <div>
-        {/* Header Title */}
+        {/* Header Title & Multi-Currency Switcher */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-400">
-              Live Customizer Summary
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-400">
+                Live Customizer Summary
+              </h3>
+              {/* Currency Selector */}
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
+                className="bg-[#0B0D12] border border-white/15 rounded-lg text-[10px] text-slate-200 px-1.5 py-0.5 font-mono cursor-pointer"
+              >
+                {Object.values(CURRENCIES).map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="text-xl font-bold font-serif text-slate-100 mt-1">
               {config.name || 'Custom ChronoCraft Edition'}
             </div>
           </div>
           <div className="text-right">
-            <span className="text-xs text-slate-400">Live Itemized Cost</span>
-            <div className="text-3xl font-extrabold text-gold-400 font-mono">
-              ${totalAmount}
+            <span className="text-xs text-slate-400">Total Price</span>
+            <div className="text-2xl font-extrabold text-gold-400 font-mono">
+              {formatCurrencyAmount(totalAmountUsd, currency)}
             </div>
           </div>
         </div>
@@ -110,41 +120,41 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
         <div className="space-y-3 text-xs mb-6">
           <div className="flex justify-between items-center text-slate-300">
             <span>Base Clock Size ({config.size}" Frame)</span>
-            <span className="font-mono text-slate-100">${basePrice}</span>
+            <span className="font-mono text-slate-100">{formatCurrencyAmount(basePrice, currency)}</span>
           </div>
 
           <div className="flex justify-between items-center text-slate-300">
             <span>Material: {matInfo.name.split(' ')[0]} {matInfo.name.split(' ')[1]}</span>
             <span className="font-mono text-slate-100">
-              {materialExtra > 0 ? `+$${materialExtra}` : 'Included'}
+              {materialExtra > 0 ? `+${formatCurrencyAmount(materialExtra, currency)}` : 'Included'}
             </span>
           </div>
 
           {photoExtra > 0 && (
             <div className="flex justify-between items-center text-gold-400">
               <span>Custom Photo Dial Printing</span>
-              <span className="font-mono">+$35</span>
+              <span className="font-mono">+{formatCurrencyAmount(35, currency)}</span>
             </div>
           )}
 
           {engravingExtra > 0 && (
             <div className="flex justify-between items-center text-gold-400">
               <span>Laser Engraving Inscription</span>
-              <span className="font-mono">+$25</span>
+              <span className="font-mono">+{formatCurrencyAmount(25, currency)}</span>
             </div>
           )}
 
           {ledExtra > 0 && (
             <div className="flex justify-between items-center text-gold-400">
               <span>LED Halo Backlight System</span>
-              <span className="font-mono">+$30</span>
+              <span className="font-mono">+{formatCurrencyAmount(30, currency)}</span>
             </div>
           )}
 
           {chimeExtra > 0 && (
             <div className="flex justify-between items-center text-gold-400">
-              <span>Westminster Acoustic Chime Module</span>
-              <span className="font-mono">+$40</span>
+              <span>Westminster Acoustic Chime</span>
+              <span className="font-mono">+{formatCurrencyAmount(40, currency)}</span>
             </div>
           )}
         </div>
@@ -153,15 +163,11 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
         <div className="bg-white/5 rounded-xl p-3.5 space-y-2 mb-6 border border-white/5">
           <div className="flex items-center gap-2 text-[11px] text-slate-300">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span><strong>3-Year Master Craftsman Warranty</strong> on quartz movement</span>
+            <span><strong>3-Year Warranty</strong> on precision quartz movement</span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-slate-300">
             <Truck className="w-4 h-4 text-sky-400 shrink-0" />
-            <span><strong>Real-time tracked shipping</strong> with protective wooden crate</span>
-          </div>
-          <div className="flex items-center gap-2 text-[11px] text-slate-300">
-            <Clock className="w-4 h-4 text-gold-400 shrink-0" />
-            <span>Estimated Handcrafting Lead Time: <strong>4 to 7 Business Days</strong></span>
+            <span><strong>Tracked Shipping</strong> with wooden crate protection</span>
           </div>
         </div>
 
@@ -180,7 +186,7 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
           className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-gold-500 via-gold-400 to-amber-500 text-black font-bold text-sm tracking-wide uppercase shadow-glow hover:shadow-glow-lg hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
         >
           <ShoppingCart className="w-4 h-4" />
-          <span>Order Custom Clock — ${totalAmount}</span>
+          <span>Order Custom Clock — {formatCurrencyAmount(totalAmountUsd, currency)}</span>
         </button>
 
         <div className="grid grid-cols-2 gap-3">
@@ -215,10 +221,7 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
                   Your clock will enter production in real-time immediately upon checkout.
                 </p>
               </div>
-              <button
-                onClick={() => setIsCheckoutOpen(false)}
-                className="text-slate-400 hover:text-slate-100 text-lg font-bold"
-              >
+              <button onClick={() => setIsCheckoutOpen(false)} className="text-slate-400 hover:text-slate-100 text-lg font-bold">
                 ✕
               </button>
             </div>
@@ -234,7 +237,7 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
                   placeholder="e.g. Eleanor Vance"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full bg-[#0B0D12] border border-white/15 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-gold-500"
+                  className="w-full bg-[#0B0D12] border border-white/15 rounded-xl px-4 py-2.5 text-sm text-slate-100"
                 />
               </div>
 
@@ -248,29 +251,14 @@ export const PriceCalculator: React.FC<PriceCalculatorProps> = ({ config, onOrde
                   placeholder="eleanor@vance.com"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
-                  className="w-full bg-[#0B0D12] border border-white/15 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-gold-500"
+                  className="w-full bg-[#0B0D12] border border-white/15 rounded-xl px-4 py-2.5 text-sm text-slate-100"
                 />
-              </div>
-
-              <div className="p-3 rounded-xl bg-white/5 text-xs text-slate-300 space-y-1 font-mono">
-                <div className="flex justify-between">
-                  <span>Selected Size:</span>
-                  <span className="text-slate-100 font-bold">{config.size}" Diameter</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Frame Material:</span>
-                  <span className="text-gold-400 font-bold">{config.frameMaterial.toUpperCase()}</span>
-                </div>
-                <div className="flex justify-between border-t border-white/10 pt-1 font-sans text-sm">
-                  <span className="font-bold text-slate-100">Total Charged:</span>
-                  <span className="font-mono text-gold-400 font-extrabold">${totalAmount}</span>
-                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 rounded-xl bg-gold-500 text-black font-bold text-sm tracking-wide uppercase hover:bg-gold-400 transition-colors shadow-glow"
+                className="w-full py-3 rounded-xl bg-gold-500 text-black font-bold text-sm tracking-wide uppercase shadow-glow"
               >
                 {isSubmitting ? 'Registering Order...' : 'Complete Order & Start Crafting'}
               </button>

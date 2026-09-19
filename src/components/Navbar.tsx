@@ -13,7 +13,8 @@ import {
   Users,
   Camera,
   Ruler,
-  Sparkles
+  Sparkles,
+  Gift
 } from 'lucide-react';
 
 export type ActiveTab = 'studio' | 'photo' | 'catalog' | 'room' | 'tracker' | 'auth' | 'reviews';
@@ -25,6 +26,7 @@ interface NavbarProps {
   onOpenBespokeModal: () => void;
   onOpenCoDesignModal: () => void;
   onOpenDistanceModal: () => void;
+  onOpenARModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -34,13 +36,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenBespokeModal,
   onOpenCoDesignModal,
   onOpenDistanceModal,
+  onOpenARModal,
 }) => {
   const firebaseConnected = isFirebaseConnected();
 
   return (
     <header className="sticky top-0 z-40 bg-[#08090D]/85 backdrop-blur-2xl border-b border-white/10 px-4 lg:px-8 py-3 transition-all">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Brand Logo & Gen Z Glow Badge */}
+        {/* Brand Logo */}
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onTabChange('photo')}>
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-gold-500 via-amber-400 to-yellow-300 text-black flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform font-bold">
             <Clock className="w-5 h-5 animate-pulse" />
@@ -61,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Streamlined Gen Z Navigation Tabs */}
+        {/* Navigation Tabs */}
         <nav className="flex flex-wrap items-center gap-1.5 bg-white/5 p-1.5 rounded-2xl border border-white/10 shadow-inner">
           <button
             onClick={() => onTabChange('photo')}
@@ -136,12 +139,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </nav>
 
-        {/* Quick Action Pill Buttons */}
+        {/* Action Buttons */}
         <div className="flex items-center gap-2">
+          {/* AR Camera Wall Preview */}
+          <button
+            onClick={onOpenARModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold-500 text-black hover:bg-gold-400 text-xs font-bold transition-all shadow-glow"
+            title="Live AR Camera Wall Preview"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>AR Camera Wall</span>
+          </button>
+
           <button
             onClick={onOpenDistanceModal}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-slate-100 hover:bg-white/20 text-xs font-semibold transition-colors"
-            title="Ergonomic Viewing Distance Calculator"
           >
             <Ruler className="w-3.5 h-3.5 text-gold-400" />
             <span>Size Guide</span>
@@ -153,19 +165,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Users className="w-3.5 h-3.5" />
             <span>Co-Design</span>
-          </button>
-
-          <button
-            onClick={onOpenFirebaseModal}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono transition-all ${
-              firebaseConnected
-                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300'
-                : 'border-gold-500/30 bg-gold-500/10 text-gold-300 hover:bg-gold-500/20'
-            }`}
-          >
-            <Database className="w-3.5 h-3.5" />
-            <span>{firebaseConnected ? 'Firebase' : 'Cloud Setup'}</span>
-            <Radio className={`w-3 h-3 ${firebaseConnected ? 'text-emerald-400 animate-ping' : 'text-gold-400'}`} />
           </button>
         </div>
       </div>
