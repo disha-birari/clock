@@ -6,14 +6,14 @@ import {
   Grid, 
   Eye, 
   Activity, 
-  Building2, 
   Database,
   Radio,
   Award,
   Star,
   Users,
   Camera,
-  Ruler
+  Ruler,
+  Sparkles
 } from 'lucide-react';
 
 export type ActiveTab = 'studio' | 'photo' | 'catalog' | 'room' | 'tracker' | 'auth' | 'reviews';
@@ -38,71 +38,72 @@ export const Navbar: React.FC<NavbarProps> = ({
   const firebaseConnected = isFirebaseConnected();
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0B0D12]/90 backdrop-blur-xl border-b border-white/10 px-4 lg:px-8 py-3.5 transition-all">
+    <header className="sticky top-0 z-40 bg-[#08090D]/85 backdrop-blur-2xl border-b border-white/10 px-4 lg:px-8 py-3 transition-all">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Brand Logo */}
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => onTabChange('studio')}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-gold-600 via-gold-400 to-amber-300 text-black flex items-center justify-center shadow-glow font-bold">
-            <Clock className="w-6 h-6 animate-pulse" />
+        {/* Brand Logo & Gen Z Glow Badge */}
+        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onTabChange('photo')}>
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-gold-500 via-amber-400 to-yellow-300 text-black flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform font-bold">
+            <Clock className="w-5 h-5 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-serif font-black text-lg tracking-wider text-slate-100">
+              <span className="font-serif font-black text-lg tracking-wider text-slate-100 group-hover:text-gold-400 transition-colors">
                 CHRONOCRAFT
               </span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-400 border border-gold-500/30">
-                REAL-TIME STUDIO
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-300 border border-gold-500/40 shadow-glow flex items-center gap-1">
+                <Sparkles className="w-2.5 h-2.5 text-gold-400" />
+                STUDIO v2.0
               </span>
             </div>
             <p className="text-[10px] text-slate-400 font-mono tracking-tight">
-              Bespoke Custom Clock Engineering
+              Real-Time Custom Clock Engineering
             </p>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <nav className="flex flex-wrap items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
+        {/* Streamlined Gen Z Navigation Tabs */}
+        <nav className="flex flex-wrap items-center gap-1.5 bg-white/5 p-1.5 rounded-2xl border border-white/10 shadow-inner">
+          <button
+            onClick={() => onTabChange('photo')}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'photo'
+                ? 'bg-gradient-to-r from-gold-500 to-amber-400 text-black shadow-glow scale-105'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Camera className="w-3.5 h-3.5" />
+            <span>Photo Studio</span>
+          </button>
+
           <button
             onClick={() => onTabChange('studio')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'studio'
-                ? 'bg-gold-500 text-black shadow-glow'
+                ? 'bg-gradient-to-r from-gold-500 to-amber-400 text-black shadow-glow scale-105'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
-            <span>Studio</span>
-          </button>
-
-          <button
-            onClick={() => onTabChange('photo')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'photo'
-                ? 'bg-gold-500 text-black shadow-glow'
-                : 'text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Camera className="w-3.5 h-3.5 text-amber-300" />
-            <span>Photo Memory Studio</span>
+            <span>Clock Studio</span>
           </button>
 
           <button
             onClick={() => onTabChange('catalog')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'catalog'
-                ? 'bg-gold-500 text-black shadow-glow'
+                ? 'bg-gradient-to-r from-gold-500 to-amber-400 text-black shadow-glow scale-105'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
             }`}
           >
             <Grid className="w-3.5 h-3.5" />
-            <span>Collections</span>
+            <span>Catalog</span>
           </button>
 
           <button
             onClick={() => onTabChange('room')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'room'
-                ? 'bg-gold-500 text-black shadow-glow'
+                ? 'bg-gradient-to-r from-gold-500 to-amber-400 text-black shadow-glow scale-105'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -112,9 +113,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => onTabChange('tracker')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'tracker'
-                ? 'bg-gold-500 text-black shadow-glow'
+                ? 'bg-gradient-to-r from-gold-500 to-amber-400 text-black shadow-glow scale-105'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -124,24 +125,23 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => onTabChange('auth')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeTab === 'auth'
                 ? 'bg-gold-500 text-black shadow-glow'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
             }`}
           >
             <Award className="w-3.5 h-3.5" />
-            <span>Authenticator</span>
+            <span>Verify</span>
           </button>
         </nav>
 
-        {/* Right CTA Actions */}
+        {/* Quick Action Pill Buttons */}
         <div className="flex items-center gap-2">
-          {/* Ergonomic Size Calculator Button */}
           <button
             onClick={onOpenDistanceModal}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-slate-100 hover:bg-white/20 text-xs font-semibold transition-colors"
-            title="Calculate optimal clock size based on room distance"
+            title="Ergonomic Viewing Distance Calculator"
           >
             <Ruler className="w-3.5 h-3.5 text-gold-400" />
             <span>Size Guide</span>

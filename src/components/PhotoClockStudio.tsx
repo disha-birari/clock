@@ -4,29 +4,24 @@ import {
   PhotoMaskShape, 
   ClockBodyShape, 
   ClockPinStyle, 
-  PhotoSlot, 
-  SizeInches,
-  FrameMaterial
+  PhotoSlot 
 } from '../types/clock';
 import { PhotoClockCanvas } from './PhotoClockCanvas';
 import { PdfReceiptModal } from './PdfReceiptModal';
-import { MATERIAL_DETAILS } from '../lib/presets';
 import confetti from 'canvas-confetti';
 import { 
   Camera, 
   Heart, 
   Grid, 
-  Layers, 
   Upload, 
-  Sliders, 
   Printer, 
   FileText, 
-  Check, 
   Sparkles,
   Maximize2,
   Disc,
   Hexagon,
-  Square
+  Square,
+  CheckCircle2
 } from 'lucide-react';
 
 export const DEFAULT_PHOTO_CONFIG: PhotoClockConfig = {
@@ -62,7 +57,6 @@ export const PhotoClockStudio: React.FC = () => {
   const engravingExtra = config.engravedText && config.engravedText.trim().length > 0 ? 25 : 0;
   const totalPrice = basePrice + photoExtra + bodyExtra + engravingExtra;
 
-  // Handle Photo Count Changes
   const handleSetPhotoCount = (count: 1 | 2 | 3 | 4 | 6 | 12) => {
     const newSlots: PhotoSlot[] = Array.from({ length: count }, (_, i) => {
       const existing = config.slots.find((s) => s.id === i + 1);
@@ -80,7 +74,6 @@ export const PhotoClockStudio: React.FC = () => {
     let defaultMask: PhotoMaskShape = 'circle';
     if (count === 4) defaultMask = 'quadrant';
     else if (count === 12) defaultMask = '12-hour-circles';
-    else if (count === 2) defaultMask = 'circle';
 
     setConfig({
       ...config,
@@ -90,7 +83,6 @@ export const PhotoClockStudio: React.FC = () => {
     });
   };
 
-  // Handle Individual Slot Image Upload
   const handleSlotImageUpload = (slotId: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -115,75 +107,79 @@ export const PhotoClockStudio: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Top Header Banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+      {/* Gen Z Banner Header */}
+      <div className="glass-panel-genz rounded-3xl p-6 border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xl">
         <div>
-          <h2 className="text-xl font-bold font-serif text-slate-100 flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-300 border border-gold-500/30 uppercase tracking-widest">
+              ✨ 3-Step Easy Visualizer
+            </span>
+          </div>
+          <h2 className="text-2xl font-black font-serif text-slate-100 mt-1 flex items-center gap-2">
             <Camera className="w-6 h-6 text-gold-400" />
-            Multi-Photo Memory Clock Studio
+            Multi-Photo Custom Memory Clock Studio
           </h2>
-          <p className="text-xs text-slate-400">
-            Customize bespoke photo memory wall clocks with custom photo counts, mask shapes, clock body outlines & pins.
+          <p className="text-xs text-slate-400 mt-0.5">
+            Select how many photos to include, pick your cutout mask shape, fit images, and download your instant PDF spec receipt.
           </p>
         </div>
 
-        {/* Action: Open Printable PDF Spec Receipt */}
         <button
           onClick={() => {
-            confetti({ particleCount: 60, spread: 60 });
+            confetti({ particleCount: 70, spread: 70 });
             setIsReceiptOpen(true);
           }}
-          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-gold-500 via-amber-400 to-gold-600 text-black font-bold text-xs uppercase tracking-wider shadow-glow hover:scale-105 transition-all flex items-center gap-2"
+          className="px-6 py-3 rounded-2xl bg-gradient-to-r from-gold-500 via-amber-400 to-yellow-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-glow hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shrink-0"
         >
           <FileText className="w-4 h-4" />
-          <span>Download PDF Spec & Receipt</span>
+          <span>Download PDF Spec & Price Receipt</span>
         </button>
       </div>
 
-      {/* Main Studio Grid */}
+      {/* Main Studio Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Real-Time HTML5 Canvas Visualizer */}
+        {/* Left Column: Live Canvas Visualizer Card */}
         <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-24">
-          <div className="bg-[#11141D]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[460px]">
+          <div className="glass-card-gold rounded-3xl p-6 flex flex-col items-center justify-center relative min-h-[460px]">
             <div className="w-full flex items-center justify-between border-b border-white/10 pb-3 mb-4 text-xs">
-              <span className="text-slate-400 font-mono text-[10px] uppercase tracking-wider flex items-center gap-1">
+              <span className="text-slate-300 font-mono text-[10px] uppercase tracking-wider flex items-center gap-1.5 font-bold">
                 <Camera className="w-3.5 h-3.5 text-gold-400" />
-                Live Photo Canvas ({config.photoCount} Photo Slots)
+                Live Customizer ({config.photoCount} Photo Slots)
               </span>
-              <span className="text-gold-400 font-mono font-bold text-sm">
-                Itemized: ${totalPrice}
+              <span className="text-gold-400 font-mono font-bold text-base">
+                ${totalPrice}
               </span>
             </div>
 
-            {/* Photo Clock Canvas */}
+            {/* Canvas Clock */}
             <div className="my-auto py-2">
               <PhotoClockCanvas config={config} sizePx={340} />
             </div>
 
-            {/* Price Info Bar */}
+            {/* Spec Footer */}
             <div className="w-full pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-300">
-              <span>{config.bodyShape.toUpperCase()} • {config.maskShape.toUpperCase()}</span>
-              <span className="text-gold-400 font-bold">${totalPrice}</span>
+              <span className="text-[11px]">{config.bodyShape.toUpperCase()} • {config.maskShape.toUpperCase()} MASK</span>
+              <span className="text-gold-400 font-bold">${totalPrice} TOTAL</span>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Step-by-Step Customizer Panel */}
-        <div className="lg:col-span-7 bg-[#11141D]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl space-y-6">
-          {/* Step Selector Buttons */}
+        {/* Right Column: Sorted Wizard Steps */}
+        <div className="lg:col-span-7 glass-panel-genz rounded-3xl p-6 space-y-6">
+          {/* Sorted Step Wizard Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 border-b border-white/10 pb-4">
             {[
               { step: 1, label: '1. Photo Count' },
               { step: 2, label: '2. Mask Shapes' },
-              { step: 3, label: '3. Fit Slot Photos' },
+              { step: 3, label: '3. Fit Photos' },
               { step: 4, label: '4. Body & Pins' },
             ].map((s) => (
               <button
                 key={s.step}
                 onClick={() => setActiveStep(s.step as any)}
-                className={`py-2 px-3 rounded-xl font-medium text-xs text-center transition-all ${
+                className={`py-2.5 px-3 rounded-2xl font-bold text-xs text-center transition-all ${
                   activeStep === s.step
-                    ? 'bg-gold-500 text-black shadow-glow font-bold'
+                    ? 'bg-gradient-to-r from-gold-500 to-amber-400 text-black shadow-glow scale-105'
                     : 'text-slate-400 hover:text-slate-100 hover:bg-white/5'
                 }`}
               >
@@ -194,13 +190,13 @@ export const PhotoClockStudio: React.FC = () => {
 
           {/* STEP 1: PHOTO QUANTITY SELECTION */}
           {activeStep === 1 && (
-            <div className="space-y-6">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gold-400">
-                Select Number of Photo Slots inside Clock Dial
+            <div className="space-y-4">
+              <label className="block text-xs font-bold uppercase tracking-wider text-gold-400">
+                1. Select Number of Photo Slots Inside Clock Dial
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
-                  { count: 1, label: '1 Solo Center Photo', desc: 'Single statement memory image' },
+                  { count: 1, label: '1 Solo Photo', desc: 'Single statement memory image' },
                   { count: 2, label: '2 Photos Split', desc: 'Side-by-side couple portrait' },
                   { count: 3, label: '3 Photos Radial', desc: 'Triangular memory collage' },
                   { count: 4, label: '4 Quadrants', desc: '4 seasonal or family photos' },
@@ -212,13 +208,13 @@ export const PhotoClockStudio: React.FC = () => {
                     <button
                       key={p.count}
                       onClick={() => handleSetPhotoCount(p.count as any)}
-                      className={`p-4 rounded-xl border text-left transition-all ${
+                      className={`p-4 rounded-2xl border text-left transition-all ${
                         isSelected
-                          ? 'border-gold-500 bg-gold-500/10 shadow-glow ring-1 ring-gold-500'
+                          ? 'border-gold-500 bg-gold-500/15 shadow-glow ring-1 ring-gold-500'
                           : 'border-white/10 bg-white/5 hover:border-white/20'
                       }`}
                     >
-                      <div className="text-base font-bold text-slate-100">{p.label}</div>
+                      <div className="text-sm font-bold text-slate-100">{p.label}</div>
                       <div className="text-[10px] text-slate-400 mt-1">{p.desc}</div>
                     </button>
                   );
@@ -229,9 +225,9 @@ export const PhotoClockStudio: React.FC = () => {
 
           {/* STEP 2: MASK SHAPE SELECTION */}
           {activeStep === 2 && (
-            <div className="space-y-6">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gold-400">
-                Select Photo Frame Mask Cutout Shape
+            <div className="space-y-4">
+              <label className="block text-xs font-bold uppercase tracking-wider text-gold-400">
+                2. Select Photo Cutout Mask Shape
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
@@ -246,16 +242,14 @@ export const PhotoClockStudio: React.FC = () => {
                     <button
                       key={m.id}
                       onClick={() => setConfig({ ...config, maskShape: m.id as PhotoMaskShape })}
-                      className={`p-4 rounded-xl border text-left transition-all flex items-center gap-3 ${
+                      className={`p-4 rounded-2xl border text-left transition-all flex items-center gap-3 ${
                         isSelected
-                          ? 'border-gold-500 bg-gold-500/10 shadow-glow text-gold-400'
+                          ? 'border-gold-500 bg-gold-500/15 shadow-glow text-gold-400'
                           : 'border-white/10 bg-white/5 text-slate-300 hover:border-white/20'
                       }`}
                     >
                       <Icon className="w-5 h-5 shrink-0" />
-                      <div>
-                        <div className="text-xs font-bold text-slate-100">{m.label}</div>
-                      </div>
+                      <div className="text-xs font-bold text-slate-100">{m.label}</div>
                     </button>
                   );
                 })}
@@ -266,28 +260,31 @@ export const PhotoClockStudio: React.FC = () => {
           {/* STEP 3: UPLOAD & FIT SLOT PHOTOS */}
           {activeStep === 3 && (
             <div className="space-y-4">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gold-400">
-                Upload & Fit Images into Photo Slots ({config.photoCount} Total Slots)
+              <label className="block text-xs font-bold uppercase tracking-wider text-gold-400">
+                3. Fit Images into Photo Slots ({config.photoCount} Total Slots)
               </label>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[340px] overflow-y-auto pr-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[340px] overflow-y-auto pr-2">
                 {config.slots.map((slot) => (
                   <div
                     key={slot.id}
-                    className="p-3.5 rounded-xl border border-white/10 bg-white/5 space-y-2 text-xs"
+                    className="p-3.5 rounded-2xl border border-white/10 bg-white/5 space-y-2 text-xs"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-slate-200">
                         📷 {slot.label || `Slot ${slot.id}`}
                       </span>
                       {slot.imageUrl && (
-                        <span className="text-[10px] text-emerald-400 font-mono">IMAGE LOADED</span>
+                        <span className="text-[10px] text-emerald-400 font-mono font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          LOADED
+                        </span>
                       )}
                     </div>
 
-                    <label className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gold-500 text-black font-semibold text-xs cursor-pointer hover:bg-gold-400 transition-colors">
+                    <label className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gold-500 text-black font-bold text-xs cursor-pointer hover:bg-gold-400 transition-colors shadow-glow">
                       <Upload className="w-3.5 h-3.5" />
-                      Upload Slot Image
+                      Upload Image
                       <input
                         type="file"
                         accept="image/*"
@@ -322,9 +319,8 @@ export const PhotoClockStudio: React.FC = () => {
           {/* STEP 4: BODY SHAPE & CLOCK PINS */}
           {activeStep === 4 && (
             <div className="space-y-6">
-              {/* Clock Body Shape Picker */}
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gold-400 mb-3">
+                <label className="block text-xs font-bold uppercase tracking-wider text-gold-400 mb-3">
                   Select Outer Clock Body Outline Shape
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -340,9 +336,9 @@ export const PhotoClockStudio: React.FC = () => {
                       <button
                         key={b.id}
                         onClick={() => setConfig({ ...config, bodyShape: b.id as ClockBodyShape })}
-                        className={`p-3 rounded-xl border text-center text-xs font-medium transition-all flex flex-col items-center gap-2 ${
+                        className={`p-3 rounded-2xl border text-center text-xs font-bold transition-all flex flex-col items-center gap-2 ${
                           isSelected
-                            ? 'border-gold-500 bg-gold-500/10 text-gold-400 shadow-glow'
+                            ? 'border-gold-500 bg-gold-500/15 text-gold-400 shadow-glow'
                             : 'border-white/10 bg-white/5 text-slate-300 hover:border-white/20'
                         }`}
                       >
@@ -354,9 +350,8 @@ export const PhotoClockStudio: React.FC = () => {
                 </div>
               </div>
 
-              {/* Clock Pins Style Selector */}
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gold-400 mb-3">
+                <label className="block text-xs font-bold uppercase tracking-wider text-gold-400 mb-3">
                   Clock Center Pins & Cap Craftsmanship
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -371,9 +366,9 @@ export const PhotoClockStudio: React.FC = () => {
                       <button
                         key={pin.id}
                         onClick={() => setConfig({ ...config, pinStyle: pin.id as ClockPinStyle })}
-                        className={`p-3 rounded-xl border text-center text-xs font-medium transition-all ${
+                        className={`p-3 rounded-2xl border text-center text-xs font-bold transition-all ${
                           isSelected
-                            ? 'border-gold-500 bg-gold-500/10 text-gold-400 shadow-glow'
+                            ? 'border-gold-500 bg-gold-500/15 text-gold-400 shadow-glow'
                             : 'border-white/10 bg-white/5 text-slate-300 hover:border-white/20'
                         }`}
                       >
@@ -384,9 +379,8 @@ export const PhotoClockStudio: React.FC = () => {
                 </div>
               </div>
 
-              {/* Engraving Inscription */}
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gold-400 mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-gold-400 mb-2">
                   Dial Laser Engraved Message
                 </label>
                 <input
@@ -395,34 +389,34 @@ export const PhotoClockStudio: React.FC = () => {
                   placeholder="e.g. OUR FAMILY MOMENTS • 2026"
                   value={config.engravedText || ''}
                   onChange={(e) => setConfig({ ...config, engravedText: e.target.value })}
-                  className="w-full bg-[#0B0D12] border border-white/15 rounded-xl px-4 py-2.5 text-xs text-slate-100"
+                  className="w-full bg-[#08090D] border border-white/15 rounded-2xl px-4 py-2.5 text-xs text-slate-100"
                 />
               </div>
             </div>
           )}
 
-          {/* Bottom Action Button */}
+          {/* Bottom Action Footer */}
           <div className="pt-4 border-t border-white/10 flex items-center justify-between">
             <div className="text-xs">
-              <span className="text-slate-400 block">Total Spec Price:</span>
-              <span className="text-2xl font-bold font-mono text-gold-400">${totalPrice}</span>
+              <span className="text-slate-400 block text-[10px]">TOTAL SPEC PRICE:</span>
+              <span className="text-2xl font-black font-mono text-gold-400">${totalPrice}</span>
             </div>
 
             <button
               onClick={() => {
-                confetti({ particleCount: 70, spread: 70 });
+                confetti({ particleCount: 80, spread: 80 });
                 setIsReceiptOpen(true);
               }}
-              className="px-6 py-3 rounded-xl bg-gold-500 text-black font-bold text-xs uppercase tracking-wider hover:bg-gold-400 transition-all shadow-glow flex items-center gap-2"
+              className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-gold-500 via-amber-400 to-yellow-400 text-black font-black text-xs uppercase tracking-wider hover:scale-105 active:scale-95 transition-all shadow-glow flex items-center gap-2"
             >
               <Printer className="w-4 h-4" />
-              <span>Download PDF Spec Sheet & Receipt</span>
+              <span>Download PDF Spec & Receipt</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Downloadable PDF Receipt Modal */}
+      {/* PDF Receipt Modal */}
       <PdfReceiptModal
         isOpen={isReceiptOpen}
         onClose={() => setIsReceiptOpen(false)}

@@ -10,19 +10,26 @@ export default {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
-        studio: {
+        obsidian: {
+          DEFAULT: '#08090D',
           950: '#0B0D12',
-          900: '#11141D',
-          850: '#181C28',
-          800: '#1F2434',
-          700: '#2D3449',
-          600: '#414B66',
+          900: '#0F121C',
+          850: '#161B29',
+          800: '#1F263B',
         },
         gold: {
+          300: '#FFF1A4',
           400: '#FCE076',
           500: '#E6C453',
           600: '#C7A033',
           700: '#A37E20',
+        },
+        neon: {
+          rose: '#F43F5E',
+          sky: '#38BDF8',
+          amber: '#F59E0B',
+          emerald: '#10B981',
+          purple: '#A855F7',
         },
         wood: {
           walnut: '#3D251E',
@@ -38,20 +45,20 @@ export default {
         mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {
-        glow: '0 0 25px -5px rgba(230, 196, 83, 0.3)',
-        'glow-lg': '0 0 50px -10px rgba(230, 196, 83, 0.4)',
-        glass: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        glow: '0 0 25px -5px rgba(230, 196, 83, 0.35)',
+        'glow-lg': '0 0 45px -8px rgba(230, 196, 83, 0.5)',
+        'glow-neon': '0 0 30px -5px rgba(244, 63, 94, 0.4)',
+        glass: '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'spin-slow': 'spin 120s linear infinite',
-        'tick-bounce': 'tickBounce 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        'gradient-x': 'gradientX 6s ease infinite',
       },
       keyframes: {
-        tickBounce: {
-          '0%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.02)' },
-          '100%': { transform: 'scale(1)' },
+        gradientX: {
+          '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left center' },
+          '50%': { 'background-size': '200% 200%', 'background-position': 'right center' },
         },
       },
     },
