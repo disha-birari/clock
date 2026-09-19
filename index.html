@@ -1,87 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Photo Clock - Welcome</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            flex-direction: column;
-            text-align: center;
-        }
-        .container {
-            max-width: 600px;
-            padding: 2rem;
-            background: #ffffff;
-            border-radius: 1.5rem;
-            box-shadow: 20px 20px 60px #d0d0d0, -20px -20px 60px #ffffff;
-            transition: transform 0.3s ease-in-out;
-        }
-        .container:hover {
-            transform: translateY(-5px);
-        }
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 1rem;
-        }
-        p {
-            font-size: 1.125rem;
-            color: #4a5568;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-        .cta-button {
-            background-color: #3b82f6; /* Blue-500 */
-            color: white;
-            padding: 1rem 2.5rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-            border-radius: 9999px; /* Pill shape */
-            text-decoration: none;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-        }
-        .cta-button:hover {
-            background-color: #2563eb; /* Blue-600 */
-            transform: scale(1.05);
-        }
-        .logo {
-            margin-bottom: 1.5rem;
-            width: 100px;
-            height: 100px;
-        }
-        .logo svg {
-            fill: #3b82f6;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
-                <path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586V7z"/>
-            </svg>
-        </div>
-        <h1>Your Moments, Your Time</h1>
-        <p>
-            Create a unique and personal analog clock with your favorite photos.
-            Add up to four cherished memories to the clock face and watch them
-            accompany every second, minute, and hour of your day.
-        </p>
-        <a href="clock.html" class="cta-button">Let's customize your clock!</a>
-    </div>
-</body>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏱️</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChronoCraft Studio — Real-Time Custom Clock Studio & Client Platform</title>
+    <meta name="description" content="Design bespoke luxury wall & desk clocks in real-time. Live 2D/3D customizer visualizer, instant pricing, room scale visualizer, and real-time Firebase order tracking." />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#0B0D12] text-slate-100 antialiased selection:bg-gold-500 selection:text-black overflow-x-hidden">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

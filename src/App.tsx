@@ -1,0 +1,194 @@
+import React, { useState, useEffect } from 'react';
+import { ClockConfig } from './types/clock';
+import { DEFAULT_CLOCK_CONFIG, PRESET_CLOCKS } from './lib/presets';
+import { Navbar, ActiveTab } from './components/Navbar';
+import { ClockCanvas } from './components/ClockCanvas';
+import { ClockStudio } from './components/ClockStudio';
+import { PriceCalculator } from './components/PriceCalculator';
+import { RoomVisualizer } from './components/RoomVisualizer';
+import { OrderTracker } from './components/OrderTracker';
+import { Catalog } from './components/Catalog';
+import { FirebaseModal } from './components/FirebaseModal';
+import { BespokeQuoteModal } from './components/BespokeQuoteModal';
+import { LiveChatWidget } from './components/LiveChatWidget';
+import { CollaborativeSessionModal } from './components/CollaborativeSessionModal';
+import { SerialAuthenticator } from './components/SerialAuthenticator';
+import { CustomerReviews } from './components/CustomerReviews';
+import { LiveActivityTicker } from './components/LiveActivityTicker';
+import { 
+  Sparkles, 
+  RotateCcw, 
+  Clock
+} from 'lucide-react';
+
+export function App() {
+  const [activeTab, setActiveTab] = useState<ActiveTab>('studio');
+  const [clockConfig, setClockConfig] = useState<ClockConfig>(DEFAULT_CLOCK_CONFIG);
+  const [activeTrackingNumber, setActiveTrackingNumber] = useState<string>('CHRONO-98421-US');
+
+  // Modals state
+  const [isFirebaseModalOpen, setIsFirebaseModalOpen] = useState(false);
+  const [isBespokeModalOpen, setIsBespokeModalOpen] = useState(false);
+  const [isCoDesignModalOpen, setIsCoDesignModalOpen] = useState(false);
+
+  // Parse share link ?design= if present
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sharedDesign = urlParams.get('design');
+      if (sharedDesign) {
+        const parsed = JSON.parse(decodeURIComponent(sharedDesign));
+        setClockConfig(parsed);
+      }
+    } catch (e) {
+      console.warn('Failed to parse share link', e);
+    }
+  }, []);
+
+  const handleOrderCreated = (trackingNumber: string) => {
+    setActiveTrackingNumber(trackingNumber);
+    setActiveTab('tracker');
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0B0D12] text-slate-100 flex flex-col font-sans">
+      {/* Top Navigation */}
+      <Navbar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onOpenFirebaseModal={() => setIsFirebaseModalOpen(true)}
+        onOpenBespokeModal={() => setIsBespokeModalOpen(true)}
+        onOpenCoDesignModal={() => setIsCoDesignModalOpen(true)}
+      />
+
+      {/* Real-Time Live Activity Stream Ticker */}
+      <LiveActivityTicker />
+
+      {/* Main Content Body */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-8">
+        {/* VIEW 1: STUDIO CUSTOMIZER */}
+        {activeTab === 'studio' && (
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Left Column: Live HTML5 Canvas Clock Visualizer */}
+              <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
+                <div className="bg-[#11141D]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[460px]">
+                  {/* Preset quick buttons top overlay */}
+                  <div className="w-full flex items-center justify-between border-b border-white/10 pb-3 mb-4 text-xs">
+                    <span className="text-slate-400 font-mono text-[10px] uppercase tracking-wider flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-gold-400" />
+                      Live Canvas Renderer ({clockConfig.size}" Scale)
+                    </span>
+                    <button
+                      onClick={() => setClockConfig(DEFAULT_CLOCK_CONFIG)}
+                      className="text-slate-400 hover:text-gold-400 flex items-center gap-1 font-semibold transition-colors"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      Reset Specs
+                    </button>
+                  </div>
+
+                  {/* Real-time Ticking HTML5 Canvas Clock Component */}
+                  <div className="my-auto py-4">
+                    <ClockCanvas config={clockConfig} sizePx={340} />
+                  </div>
+
+                  {/* Quick Preset Selector Buttons */}
+                  <div className="w-full pt-4 border-t border-white/10 flex items-center justify-center gap-2 overflow-x-auto">
+                    <span className="text-[10px] text-slate-400 uppercase font-mono mr-1 shrink-0">
+                      Presets:
+                    </span>
+                    {PRESET_CLOCKS.slice(0, 3).map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => setClockConfig(p)}
+                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-slate-300 transition-colors shrink-0"
+                      >
+                        {p.name.split(' ')[0]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Center/Right Column: Studio Customizer Controls & Price Calculator */}
+              <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div className="md:col-span-7">
+                  <ClockStudio config={clockConfig} onChange={setClockConfig} />
+                </div>
+                <div className="md:col-span-5">
+                  <PriceCalculator config={clockConfig} onOrderCreated={handleOrderCreated} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* VIEW 2: SIGNATURE CATALOG */}
+        {activeTab === 'catalog' && (
+          <Catalog
+            onSelectPreset={(selectedConfig) => {
+              setClockConfig(selectedConfig);
+              setActiveTab('studio');
+            }}
+          />
+        )}
+
+        {/* VIEW 3: ROOM WALL BACKDROP VISUALIZER */}
+        {activeTab === 'room' && <RoomVisualizer config={clockConfig} />}
+
+        {/* VIEW 4: REAL-TIME CLIENT ORDER TRACKER */}
+        {activeTab === 'tracker' && <OrderTracker initialTracking={activeTrackingNumber} />}
+
+        {/* VIEW 5: LASER SERIAL AUTHENTICATOR */}
+        {activeTab === 'auth' && <SerialAuthenticator />}
+
+        {/* VIEW 6: VERIFIED CUSTOMER REVIEWS */}
+        {activeTab === 'reviews' && <CustomerReviews />}
+      </main>
+
+      {/* Floating Live Consultation Chat Widget */}
+      <LiveChatWidget />
+
+      {/* Collaborative Session Modal */}
+      <CollaborativeSessionModal
+        isOpen={isCoDesignModalOpen}
+        onClose={() => setIsCoDesignModalOpen(false)}
+        config={clockConfig}
+        onConfigSynced={(synced) => setClockConfig(synced)}
+      />
+
+      {/* Firebase Settings Modal */}
+      <FirebaseModal
+        isOpen={isFirebaseModalOpen}
+        onClose={() => setIsFirebaseModalOpen(false)}
+      />
+
+      {/* Bespoke Architectural Quote Modal */}
+      <BespokeQuoteModal
+        isOpen={isBespokeModalOpen}
+        onClose={() => setIsBespokeModalOpen(false)}
+      />
+
+      {/* Footer */}
+      <footer className="border-t border-white/10 bg-[#0B0D12] py-8 px-4 text-xs text-slate-400 mt-12">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-serif font-bold text-slate-200">CHRONOCRAFT STUDIO</span>
+            <span>— Precision Real-Time Custom Clock Platform</span>
+          </div>
+
+          <div className="flex items-center gap-4 text-[11px]">
+            <button onClick={() => setIsFirebaseModalOpen(true)} className="hover:text-gold-400 transition-colors">
+              Firebase Config
+            </button>
+            <button onClick={() => setIsBespokeModalOpen(true)} className="hover:text-gold-400 transition-colors">
+              Bespoke Inquiries
+            </button>
+            <span>© 2026 ChronoCraft. All rights reserved.</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
