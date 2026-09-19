@@ -12,10 +12,10 @@ import {
 import { MATERIAL_DETAILS, SIZE_PRICING } from '../lib/presets';
 import { playChimeSound } from './ClockCanvas';
 import { ContrastMeter } from './ContrastMeter';
+import { LivePhotoUploader } from './LivePhotoUploader';
 import { 
   Palette, 
   Sparkles, 
-  Upload, 
   Sliders, 
   Type, 
   Volume2, 
@@ -42,20 +42,12 @@ export const ClockStudio: React.FC<ClockStudioProps> = ({ config, onChange }) =>
     });
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result as string;
-        onChange({
-          ...config,
-          dialTexture: 'custom-photo',
-          customPhotoUrl: result,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
+  const handlePhotoSelected = (photoDataUrl: string) => {
+    onChange({
+      ...config,
+      dialTexture: 'custom-photo',
+      customPhotoUrl: photoDataUrl,
+    });
   };
 
   const toggleSubdial = (sub: WorldSubdial) => {
@@ -100,7 +92,7 @@ export const ClockStudio: React.FC<ClockStudioProps> = ({ config, onChange }) =>
           }`}
         >
           <Palette className="w-3.5 h-3.5" />
-          <span>Dial & Hands</span>
+          <span>Dial & Photos</span>
         </button>
 
         <button
@@ -202,9 +194,21 @@ export const ClockStudio: React.FC<ClockStudioProps> = ({ config, onChange }) =>
         </div>
       )}
 
-      {/* TAB 2: DIAL & HANDS */}
+      {/* TAB 2: DIAL & PHOTOS */}
       {activeTab === 'dial' && (
         <div className="space-y-6">
+          {/* Instant Real-Time Photo Uploader */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gold-400 mb-3">
+              Instant Real-Time Photo Dial Customizer
+            </label>
+            <LivePhotoUploader
+              onPhotoSelected={handlePhotoSelected}
+              currentPhotoUrl={config.customPhotoUrl}
+              label="Upload File, Take Live Webcam Snap, or Paste Image Link"
+            />
+          </div>
+
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gold-400 mb-3">
               Dial Texture & Pattern
@@ -228,41 +232,6 @@ export const ClockStudio: React.FC<ClockStudioProps> = ({ config, onChange }) =>
                   {tex.label}
                 </button>
               ))}
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl border border-gold-500/30 bg-gold-500/5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-slate-100 flex items-center gap-2">
-                <ImageIcon className="w-4 h-4 text-gold-400" />
-                Custom Dial Photo Overlay
-              </span>
-              {config.dialTexture === 'custom-photo' && (
-                <span className="text-xs px-2 py-0.5 rounded bg-gold-500/20 text-gold-400 font-mono">
-                  ACTIVE ON DIAL
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-400 mb-3">
-              Upload family photos, wedding portraits, corporate logos, or custom artwork to embed right onto the clock face.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gold-500 text-black text-xs font-semibold cursor-pointer hover:bg-gold-400 transition-colors">
-                <Upload className="w-4 h-4" />
-                Choose Photo File
-                <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-              </label>
-              {config.customPhotoUrl && (
-                <button
-                  onClick={() => {
-                    updateConfig('dialTexture', 'brushed-wood');
-                    updateConfig('customPhotoUrl', undefined);
-                  }}
-                  className="px-3 py-2 rounded-xl bg-red-500/20 text-red-400 text-xs font-medium hover:bg-red-500/30"
-                >
-                  Remove Photo
-                </button>
-              )}
             </div>
           </div>
 
@@ -291,7 +260,6 @@ export const ClockStudio: React.FC<ClockStudioProps> = ({ config, onChange }) =>
               ))}
             </div>
 
-            {/* Live Contrast Meter Analyzer */}
             <ContrastMeter
               handColor={config.handColor || '#E6C453'}
               dialColor={config.dialColor || '#181C28'}
